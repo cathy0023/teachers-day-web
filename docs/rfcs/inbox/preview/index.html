@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>中五班 · 教师节礼物 · 朝花幼儿园(来广营)</title>
+  <style>
+    /* ============ 基础排版 ============ */
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      color: #5a3a1c;
+      background: linear-gradient(180deg, #fff7e0 0%, #ffe9b0 60%, #ffd56a 100%);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ============ 通用变量 ============ */
+    :root {
+      --sun: #ffb84d;
+      --sun-deep: #ff8a00;
+      --leaf: #79b34d;
+      --leaf-deep: #4f8a25;
+      --brown: #7a4a1f;
+      --cream: #fff7e0;
+      --paper: #fffdf6;
+      --shadow: 0 10px 30px rgba(122, 74, 31, .0.18);
+    }
+
+    /* ============ 标题区 ============ */
+    .header {
+      text-align: center;
+      padding: 48px 20px 24px;
+      position: relative;
+      z-index: 2;
+    }
+    .header .kindergarten {
+      display: inline-block;
+      padding: 6px 18px;
+      background: var(--leaf);
+      color: white;
+      border-radius: 999px;
+      font-size: 14px;
+      letter-spacing: 2px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+    .header h1 {
+      font-size: clamp(28px, 5vw, 44px);
+      color: var(--sun-deep);
+      margin-bottom: 8px;
+      text-shadow: 0 2px 0 rgba(255,255,255,.6);
+    }
+    .header .class-tag {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--paper);
+      border: 2px dashed var(--sun);
+      border-radius: 12px;
+      font-size: 16px;
+      color: var(--brown);
+      margin-top: 8px;
+    }
+    .header .subtitle {
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--brown);
+      opacity: 0.75;
+    }
+
+    /* ============ 三扇教室门 ============ */
+    .doors {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      max-width: 980px;
+      margin: 40px auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 2;
+    }
+    .door {
+      cursor: pointer;
+      position: relative;
+      transition: transform .3s ease;
+    }
+    .door:hover { transform: translateY(-6px); }
+
+    .door-frame {
+      position: relative;
+      background: linear-gradient(180deg, #f5c47a 0%, #c98947 100%);
+      border: 6px solid var(--brown);
+      border-radius: 18px 18px 8px 8px;
+      padding: 18px 18px 0;
+      box-shadow: var(--shadow);
+      aspect-ratio: 3 / 4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 14px;
+    }
+    /* 门牌 */
+    .door-plate {
+      background: var(--paper);
+      border: 2px solid var(--brown);
+      border-radius: 8px;
+      padding: 4px 12px;
+      font-size: 13px;
+      color: var(--brown);
+      font-weight: bold;
+    }
+    /* 卡通占位 */
+    .avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: repeating-linear-gradient(
+        45deg,
+        #e8e3d3,
+        #e8e3d3 8px,
+        #ddd6c0 8px,
+        #ddd6c0 16px
+      );
+      border: 4px dashed var(--brown);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--brown);
+      text-align: center;
+      line-height: 1.3;
+      padding: 6px;
+    }
+    .door-role {
+      font-size: 22px;
+      font-weight: bold;
+      color: var(--brown);
+      margin-top: 4px;
+    }
+    .door-name {
+      font-size: 14px;
+      color: var(--brown);
+      opacity: 0.7;
+      background: var(--paper);
+      padding: 4px 12px;
+      border-radius: 12px;
+    }
+    /* 门把手 */
+    .door-handle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      width: 12px;
+      height: 12px;
+      background: var(--sun-deep);
+      border-radius: 50%;
+      box-shadow: inset -2px -2px 4px rgba(0,0,0,.3);
+    }
+    /* 小凳子 — 作为按钮底座 */
+    .stool {
+      width: 70%;
+      height: 28px;
+      background: linear-gradient(180deg, #d49b66 0%, #a06b3c 100%);
+      border-radius: 4px 4px 14px 14px;
+      margin: 0 auto;
+      position: relative;
+      box-shadow: 0 4px 0 var(--brown), var(--shadow);
+    }
+    .stool::before, .stool::after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      width: 8px;
+      height: 14px;
+      background: var(--brown);
+      border-radius: 0 0 4px 4px;
+    }
+    .stool::before { left: 10%; }
+    .stool::after { right: 10%; }
+
+    /* ============ 整体感谢页(收尾) ============ */
+    .closing {
+      max-width: 720px;
+      margin: 60px auto 80px;
+      padding: 36px 32px;
+      background: var(--paper);
+      border: 3px solid var(--sun);
+      border-radius: 24px;
+      position: relative;
+      z-index: 2;
+      box-shadow: var(--shadow);
+    }
+    .closing h2 {
+      text-align: center;
+      color: var(--sun-deep);
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+    .closing p {
+      line-height: 1.9;
+      font-size: 15px;
+      color: var(--brown);
+      text-indent: 2em;
+      margin-bottom: 12px;
+    }
+    .closing .signature {
+      text-align: right;
+      margin-top: 18px;
+      color: var(--leaf-deep);
+      font-style: italic;
+    }
+
+    /* ============ 向日葵装饰 ============ */
+    .sunflower-deco {
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      z-index: 1;
+      opacity: 0.85;
+      animation: floaty 6s ease-in-out infinite;
+    }
+    .sunflower-deco.left { top: 80px; left: -20px; transform: rotate(-15deg); }
+    .sunflower-deco.right { top: 140px; right: -10px; transform: rotate(20deg); animation-delay: 1.5s; }
+
+    .sunflower-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+      50% { transform: translateY(-12px) rotate(var(--r, 0deg)); }
+    }
+
+    /* ============ 撒花 ============ */
+    .confetti {
+      position: fixed;
+      top: -10vh;
+      width: 100%;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .petal {
+      position: absolute;
+      top: -30px;
+      width: 18px;
+      height: 18px;
+      background: var(--sun);
+      border-radius: 80% 0 55% 50% / 55% 0 80% 50%;
+      opacity: 0.85;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0% { transform: translateY(-10vh) rotate(0); opacity: 0; }
+      10% { opacity: 1; }
+      100% { transform: translateY(110vh) rotate(540deg); opacity: 0.8; }
+    }
+
+    /* ============ 个人感谢页(默认隐藏) ============ */
+    .teacher-page {
+      display: none;
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 32px;
+      background: var(--paper);
+      border: 3px solid var(--sun);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      position: relative;
+      z-index: 2;
+    }
+    .teacher-page.active { display: block; animation: popIn .6s ease; }
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(20px) scale(.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .teacher-page .top {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    .teacher-page .top .avatar { width: 90px; height: 90px; }
+    .teacher-page h2 { color: var(--sun-deep); font-size: 26px; }
+    .teacher-page .role { color: var(--leaf-deep); font-size: 14px; }
+    .teacher-page .greeting {
+      background: var(--cream);
+      border-left: 4px solid var(--sun);
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin: 16px 0;
+      line-height: 1.8;
+      color: var(--brown);
+    }
+    .audio-placeholder {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: #fff;
+      border: 2px dashed var(--sun);
+      border-radius: 999px;
+      margin-top: 12px;
+      color: var(--brown);
+      font-size: 14px;
+    }
+    .audio-placeholder .dot {
+      width: 10px; height: 10px;
+      background: var(--sun-deep);
+      border-radius: 50%;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50%      { transform: scale(1.3); opacity: 0.6; }
+    }
+    .back-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 8px 18px;
+      background: var(--leaf);
+      color: white;
+      border-radius: 999px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+    }
+    .back-btn:hover { background: var(--leaf-deep); }
+
+    /* ============ 顶部页脚 ============ */
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: var(--brown);
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 撒花层 -->
+  <div class="confetti" id="confetti"></div>
+
+  <!-- 左右两朵装饰向日葵 -->
+  <div class="sunflower-deco left">
+    <svg class="sunflower-svg" viewBox="0 0 100 100">
+      <g transform="translate(50 50)">
+        <g id="petals">
+          <!-- 12 片花瓣 -->
+          <ellipse cx="0" cy="-30" rx="10" ry="20" fill="#ffb84d"/>
+        </g>
+        <use href="#petals" transform="rotate(30)"/>
+        <use href="#petals" transform="rotate(60)"/>
+        <use href="#petals" transform="rotate(90)"/>
+        <use href="#petals" transform="rotate(120)"/>
+        <use href="#petals" transform="rotate(150)"/>
+        <use href="#petals" transform="rotate(180)"/>
+        <use href="#petals" transform="rotate(210)"/>
+        <use href="#petals" transform="rotate(240)"/>
+        <use href="#petals" transform="rotate(270)"/>
+        <use href="#petals" transform="rotate(300)"/>
+        <use href="#petals" transform="rotate(330)"/>
+        <circle cx="0" cy="0" r="14" fill="#7a4a1f"/>
+        <circle cx="-3" cy="-3" r="2" fill="#5a3a1c"/>
+        <circle cx="4" cy="-2" r="2" fill="#5a3a1c"/>
+        <circle cx="-2" cy="4" r="2" fill="#5a3a1c"/>
+      </g>
+      <!-- 茎 -->
+      <rect x="48" y="50" width="4" height="40" fill="#4f8a25"/>
+      <!-- 叶 -->
+      <ellipse cx="38" cy="72" rx="10" ry="5" fill="#79b34d" transform="rotate(-30 38 72)"/>
+    </svg>
+  </div>
+
+  <div class="sunflower-deco right">
+    <svg class="sunflower-svg" viewBox="0 0 100 100">
+      <g transform="translate(50 50)">
+        <g id="petals2">
+          <ellipse cx="0" cy="-28" rx="9" ry="18" fill="#ff8a00"/>
+        </g>
+        <use href="#petals2" transform="rotate(45)"/>
+        <use href="#petals2" transform="rotate(90)"/>
+        <use href="#petals2" transform="rotate(135)"/>
+        <use href="#petals2" transform="rotate(180)"/>
+        <use href="#petals2" transform="rotate(225)"/>
+        <use href="#petals2" transform="rotate(270)"/>
+        <use href="#petals2" transform="rotate(315)"/>
+        <circle cx="0" cy="0" r="12" fill="#7a4a1f"/>
+      </g>
+      <rect x="48" y="48" width="4" height="42" fill="#4f8a25"/>
+    </svg>
+  </div>
+
+  <!-- 标题区 -->
+  <header class="header">
+    <div class="kindergarten">朝花幼儿园 · 来广营</div>
+    <h1>🌻 教师节快乐 🌻</h1>
+    <div class="class-tag">中五班 · 三位老师的专属礼物</div>
+    <div class="subtitle">— 点击下面的"教室门",走进每位老师的世界 —</div>
+  </header>
+
+  <!-- 三扇教室门(默认主页) -->
+  <main id="home">
+    <section class="doors">
+      <!-- 主班老师 -->
+      <div class="door" onclick="openTeacher(0)">
+        <div class="door-frame">
+          <div class="door-plate">主班 · Teacher A</div>
+          <div class="avatar">卡通形象<br>待上传</div>
+          <div class="door-role">主班老师</div>
+          <div class="door-name">（老师姓名待填）</div>
+          <div class="door-handle"></div>
+        </div>
+        <div class="stool"></div>
+      </div>
+
+      <!-- 配班老师 -->
+      <div class="door" onclick="openTeacher(1)">
+        <div class="door-frame">
+          <div class="door-plate">配班 · Teacher B</div>
+          <div class="avatar">卡通形象<br>待上传</div>
+          <div class="door-role">配班老师</div>
+          <div class="door-name">（老师姓名待填）</div>
+          <div class="door-handle"></div>
+        </div>
+        <div class="stool"></div>
+      </div>
+
+      <!-- 生活老师 -->
+      <div class="door" onclick="openTeacher(2)">
+        <div class="door-frame">
+          <div class="door-plate">生活 · Teacher C</div>
+          <div class="avatar">卡通形象<br>待上传</div>
+          <div class="door-role">生活老师</div>
+          <div class="door-name">（老师姓名待填）</div>
+          <div class="door-handle"></div>
+        </div>
+        <div class="stool"></div>
+      </div>
+    </section>
+
+    <!-- 整体感谢页(收尾) -->
+    <section class="closing">
+      <h2>🌻 致中五班的三位老师 🌻</h2>
+      <p>
+        （这里是家长视角的整体感谢信初稿 — 你可以替换成你想说的话。
+        模板示例:感谢主班老师的专业、配班老师的细致、生活老师对孩子日常起居的温柔守护。
+        我们看到的每一个孩子的笑容,背后都有你们的用心。）
+      </p>
+      <p>
+        向日葵永远追着太阳走,而你们就像孩子们的太阳。
+        这一年,有你们真好。教师节快乐,你们辛苦了。
+      </p>
+      <div class="signature">—— 中五班 ××小朋友 一家</div>
+    </section>
+  </main>
+
+  <!-- 三位老师的个人感谢页(默认隐藏) -->
+  <section class="teacher-page" id="teacher-0">
+    <div class="top">
+      <div class="avatar">卡通形象<br>待上传</div>
+      <div>
+        <h2>致 主班老师</h2>
+        <div class="role">中五班 · 主班</div>
+      </div>
+    </div>
+    <div class="greeting">
+      （这里是给主班老师的简短问候 — 模板示例:
+      ××老师,这一年你用专业和爱,带孩子们认识了第一次规则、第一次合作、第一次勇敢。谢谢你。）
+    </div>
+    <div class="audio-placeholder">
+      <span class="dot"></span>
+      🎤 孩子录音占位 — 把 .mp3 放进 audio/ 文件夹后接入
+    </div>
+    <button class="back-btn" onclick="goHome()">← 回到中五班</button>
+  </section>
+
+  <section class="teacher-page" id="teacher-1">
+    <div class="top">
+      <div class="avatar">卡通形象<br>待上传</div>
+      <div>
+        <h2>致 配班老师</h2>
+        <div class="role">中五班 · 配班</div>
+      </div>
+    </div>
+    <div class="greeting">
+      （这里是给配班老师的简短问候 — 模板示例:
+      ××老师,谢谢你在每一个细节里的耐心,在每一次小情绪里的温柔接住。）
+    </div>
+    <div class="audio-placeholder">
+      <span class="dot"></span>
+      🎤 孩子录音占位
+    </div>
+    <button class="back-btn" onclick="goHome()">← 回到中五班</button>
+  </section>
+
+  <section class="teacher-page" id="teacher-2">
+    <div class="top">
+      <div class="avatar">卡通形象<br>待上传</div>
+      <div>
+        <h2>致 生活老师</h2>
+        <div class="role">中五班 · 生活</div>
+      </div>
+    </div>
+    <div class="greeting">
+      （这里是给生活老师的简短问候 — 模板示例:
+      ××老师,谢谢你在每一个午饭、每一次午睡、每一双洗干净的小手上的那份温暖。）
+    </div>
+    <div class="audio-placeholder">
+      <span class="dot"></span>
+      🎤 孩子录音占位
+    </div>
+    <button class="back-btn" onclick="goHome()">← 回到中五班</button>
+  </section>
+
+  <footer>© 中五班 · 教师节 2026 · 用心手作</footer>
+
+  <script>
+    // 撒花生成
+    (function makeConfetti() {
+      const layer = document.getElementById('confetti');
+      const colors = ['#ffb84d', '#ff8a00', '#79b34d', '#ffe066', '#fff7e0'];
+      for (let i = 0; i < 32; i++) {
+        const p = document.createElement('div');
+        p.className = 'petal';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.background = colors[Math.floor(Math.random() * colors.length)];
+        p.style.animationDuration = (6 + Math.random() * 6) + 's';
+        p.style.animationDelay = (Math.random() * 8) + 's';
+        p.style.width = (10 + Math.random() * 14) + 'px';
+        p.style.height = p.style.width;
+        layer.appendChild(p);
+      }
+    })();
+
+    // 路由切换
+    function openTeacher(idx) {
+      document.getElementById('home').style.display = 'none';
+      document.querySelectorAll('.teacher-page').forEach(el => el.classList.remove('active'));
+      document.getElementById('teacher-' + idx).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function goHome() {
+      document.querySelectorAll('.teacher-page').forEach(el => el.classList.remove('active'));
+      document.getElementById('home').style.display = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
