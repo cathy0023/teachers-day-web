@@ -10,25 +10,26 @@ interface HeaderProps {
 /** 顶部学校标题区 — 接收背景图 prop */
 export default function Header({ background, tone = 'light' }: HeaderProps) {
   const style: React.CSSProperties = background
-    ? {
-        backgroundImage: `linear-gradient(${
-          tone === 'dark'
-            ? 'rgba(0,0,0,0.25), rgba(0,0,0,0.4)'
-            : 'rgba(255,255,255,0.35), rgba(255,255,255,0.15)'
-        }), url(${background})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }
+    ? ({
+        '--header-img': `url(${background})`,
+      } as React.CSSProperties)
     : {}
 
   return (
-    <header className="header header-with-bg" style={style}>
-      <div className="kindergarten-tag">中五班</div>
-      <h1>🌻 {school.festival} 🌻</h1>
-      <div className="class-tag">
-        {school.className} · 三位老师的专属礼物
-      </div>
-      <div className="subtitle">— {school.subtitle} —</div>
+    <header
+      className={`header header-with-bg${tone === 'dark' ? ' header-dark' : ''}`}
+      style={style}
+    >
+      <h1 className="header-title">
+        <span className="header-sun header-sun-left" aria-hidden>
+          🌻
+        </span>
+        <span className="header-title-text">{school.festival}</span>
+        <span className="header-sun header-sun-right" aria-hidden>
+          🌻
+        </span>
+      </h1>
+      <div className="subtitle">— 中五班 · 专属礼物 —</div>
     </header>
   )
 }

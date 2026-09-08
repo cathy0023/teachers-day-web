@@ -2,7 +2,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Layout from '../components/Layout'
 import Header from '../components/Header'
-import Avatar from '../components/Avatar'
 import { teachers } from '../data/teachers'
 
 /**
@@ -21,20 +20,17 @@ export default function TeacherPage({
 
   if (!teacher) {
     return (
-      <Layout>
+      <Layout backTo="/">
         <Header background="/images/classroom.jpeg" tone="dark" />
         <div style={{ padding: 40, textAlign: 'center' }}>
-          <p>没有找到这位老师。</p>
-          <button className="back-btn" onClick={() => navigate(-1)}>
-            ← 返回
-          </button>
+          <p>没有找到这一页。</p>
         </div>
       </Layout>
     )
   }
 
   return (
-    <Layout>
+    <Layout backTo="/">
       <Header background="/images/classroom.jpeg" tone="dark" />
       <motion.section
         className="teacher-page"
@@ -43,38 +39,44 @@ export default function TeacherPage({
         transition={{ duration: 0.6 }}
       >
         <div className="top">
-          <Avatar
-            src={teacher.avatar}
-            size={120}
-            label={`${teacher.role}老师 卡通 待上传`}
-          />
-          <div>
-            <h2>致 {teacher.role}老师</h2>
-            <div className="role">
-              中五班 · {teacher.role}老师
-              <span style={{ marginLeft: 8, opacity: 0.6 }}>
-                ({teacher.name})
-              </span>
-            </div>
-          </div>
+          <img className="teacher-avatar" src={teacher.avatar} alt={teacher.name} />
+          <h2>致 {teacher.name}</h2>
         </div>
 
         <div className="greeting">{teacher.greeting}</div>
 
-        {/* 录音区 — 占位 */}
-        <div className="audio-placeholder">
-          <span className="dot" />
-          🎤 孩子录音占位 — 把音频放进 public/audio/ 后接入
+        {/* 录音区 — 图图给老师的语音 */}
+        <div className="audio-section">
+          <div className="audio-label">
+            <img className="audio-kid-avatar" src="/images/kid/tutu.png" alt="图图" />
+            <span>图图想对你说</span>
+          </div>
+          <audio controls preload="metadata" src={teacher.audio} className="audio-player">
+            您的浏览器不支持音频播放。
+          </audio>
         </div>
-        {/* 真实录音接入示例(后续启用):
-        <audio controls src={teacher.audio} preload="none" />
-        */}
+      </motion.section>
 
-        <div style={{ marginTop: 24 }}>
-          <button className="back-btn" onClick={() => navigate(-1)}>
-            ← 回到中五班
-          </button>
+      {/* 全家感谢信入口 — 置于个人感谢区底部 */}
+      <motion.section
+        className="family-entry"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+        onClick={() => navigate('/family-thanks')}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') navigate('/family-thanks')
+        }}
+        aria-label="打开图图一家致中五班的感谢信"
+      >
+        <div className="family-entry-icon">💌</div>
+        <div className="family-entry-text">
+          <div className="family-entry-title">图图一家 · 致中五班的感谢信</div>
+          <div className="family-entry-sub">一封完整的信 · 家长的心里话</div>
         </div>
+        <div className="family-entry-arrow">→</div>
       </motion.section>
     </Layout>
   )

@@ -1,12 +1,27 @@
 import type { PropsWithChildren } from 'react'
-import Confetti from './Confetti'
+import { useNavigate } from 'react-router-dom'
 import Sunflower from './Sunflower'
 
-/** 全局装饰 — 撒花层 + 两朵向日葵 */
-export default function Layout({ children }: PropsWithChildren) {
+interface LayoutProps {
+  /** 传入时,左上角显示统一返回按钮,点击跳到该路径 */
+  backTo?: string
+}
+
+/** 全局装饰 — 向日葵 + 统一返回按钮;撒心由各页面按需触发,见 Home 的 Confetti */
+export default function Layout({ children, backTo }: PropsWithChildren<LayoutProps>) {
+  const navigate = useNavigate()
   return (
     <>
-      <Confetti />
+      {backTo && (
+        <button
+          type="button"
+          className="global-back"
+          onClick={() => navigate(backTo)}
+          aria-label="返回首页"
+        >
+          ← 首页
+        </button>
+      )}
       <div className="sunflower-deco left floaty">
         <Sunflower />
       </div>

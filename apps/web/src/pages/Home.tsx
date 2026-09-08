@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import Layout from '../components/Layout'
-import Header from '../components/Header'
+import Confetti from '../components/Confetti'
 import {
   boxGameHint,
-  closingText,
   generateBoxes,
+  school,
   type Box as BoxT,
 } from '../data/teachers'
 
@@ -65,24 +65,22 @@ function GiftBox({
               <div className="real-avatar">
                 <img
                   src={box.teacher.avatar}
-                  alt={box.teacher.name}
+                  alt="礼物头像"
                   onError={(e) => {
                     ;(e.currentTarget as HTMLImageElement).style.display = 'none'
                   }}
                 />
-                <span className="avatar-fallback">
-                  {box.teacher.role}老师<br />卡通 待上传
-                </span>
               </div>
-              <div className="real-name">{box.teacher.name}</div>
-              <div className="real-role">{box.teacher.role}老师</div>
               <button
                 type="button"
                 className="open-btn"
                 onClick={() => onRealOpen(box.teacher.id)}
               >
-                打开盒子 ✨
+                <span className="open-btn-spark" aria-hidden>✨</span>
+                <span className="open-btn-text">进入感谢页</span>
+                <span className="open-btn-arrow" aria-hidden>→</span>
               </button>
+              <div className="open-hint" aria-hidden>👆 这是为您准备的专属礼物</div>
             </div>
           ) : (
             <div className="fake-content">
@@ -105,19 +103,45 @@ export default function Home({
   currentTeacherId: string
 }) {
   const navigate = useNavigate()
-  const [boxes, setBoxes] = useState<BoxT[]>(() => generateBoxes(currentTeacherId))
+  // 盒阵只在进入时生成一次(不再提供重新打乱)
+  const [boxes] = useState<BoxT[]>(() => generateBoxes(currentTeacherId))
   const [flippedSet, setFlippedSet] = useState<Set<number>>(new Set())
-  const [showClosing, setShowClosing] = useState(false)
+  // 每次翻中"自己"盒子,key++ 触发一次撒心
+  const [confettiKey, setConfettiKey] = useState(-1)
   const flippedCount = flippedSet.size
 
   return (
     <Layout>
-      <Header background="/images/kindergarten.jpg" />
+      {/* 撒心层 — 仅在 confettiKey 变化时触发一次 */}
+      <Confetti triggerKey={confettiKey} />
+
+      {/* 浮动进度 pill — 翻页过程中永远可见,不再依赖滚到底 */}
+      {flippedCount > 0 && (
+        <div className="progress-pill" aria-live="polite">
+          <span className="progress-pill-num">{flippedCount}</span>
+          <span className="progress-pill-divider">/</span>
+          <span className="progress-pill-total">6</span>
+          <span className="progress-pill-label">已翻开</span>
+        </div>
+      )}
+
+      {/* 首页 hero — 拍立得照片 + 模切贴纸标题,不再有绿色班级标签 */}
+      <section className="home-hero">
+        <div className="hero-photo">
+          <img src="/images/kindergarten.jpg" alt={`${school.kindergarten} ${school.className}`} />
+        </div>
+        <h1 className="hero-title">
+          <span className="hero-sun hero-sun-left" aria-hidden>🌻</span>
+          {school.festival}
+          <span className="hero-sun hero-sun-right" aria-hidden>🌻</span>
+        </h1>
+        <p className="hero-sub">{school.welcome}</p>
+      </section>
 
       <main className="box-page">
         <p className="tease-hint">{boxGameHint}</p>
 
-        <section className="box-grid" aria-label="9 个礼物盒">
+        <section className="box-grid" aria-label="6 个礼物盒">
           {boxes.map((b, i) => (
             <GiftBox
               key={`${currentTeacherId}-${i}`}
@@ -128,6 +152,8 @@ export default function Home({
                 const next = new Set(flippedSet)
                 next.add(i)
                 setFlippedSet(next)
+                // 翻中"自己"盒子 → 撒心
+                if (b.kind === 'real') setConfettiKey((k) => k + 1)
               }}
               onRealOpen={(teacherId) => {
                 // 命中"自己"盒子 → 跳个人感谢页
@@ -139,87 +165,32 @@ export default function Home({
 
         <div className="box-progress">
           <span>
-            已翻开 <strong>{flippedCount}</strong> / 9
+            已翻开 <strong>{flippedCount}</strong> / 6
           </span>
-          <button
-            className="reset-btn"
-            onClick={() => {
-              setBoxes(generateBoxes(currentTeacherId))
-              setFlippedSet(new Set())
-            }}
-          >
-            🔄 重新打乱
-          </button>
         </div>
 
-        {/* 整体感谢信入口 */}
+        {/* 全家感谢信入口 — 置于首页底部 */}
         <motion.section
-          className="closing-entry"
+          className="family-entry"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-          onClick={() => setShowClosing(true)}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          onClick={() => navigate('/family-thanks')}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') setShowClosing(true)
+            if (e.key === 'Enter' || e.key === ' ') navigate('/family-thanks')
           }}
-          aria-label="打开图图一家对三位老师的整体感谢信"
+          aria-label="打开图图一家致中五班的感谢信"
         >
-          <div className="closing-entry-icon">✉️</div>
-          <div className="closing-entry-text">
-            <div className="closing-entry-title">
-              图图一家 · 致三位老师的感谢信
-            </div>
-            <div className="closing-entry-sub">家长视角 · 不止是孩子的声音</div>
+          <div className="family-entry-icon">💌</div>
+          <div className="family-entry-text">
+            <div className="family-entry-title">图图一家 · 致中五班的感谢信</div>
+            <div className="family-entry-sub">一封完整的信 · 家长的心里话</div>
           </div>
-          <div className="closing-entry-arrow">→</div>
+          <div className="family-entry-arrow">→</div>
         </motion.section>
       </main>
-
-      {/* 整体感谢信浮层 */}
-      <AnimatePresence>
-        {showClosing && (
-          <motion.div
-            className="modal-mask"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowClosing(false)}
-            role="dialog"
-            aria-modal
-          >
-            <motion.div
-              className="modal-card"
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div
-                className="modal-banner"
-                style={{
-                  backgroundImage:
-                    'linear-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.6)), url(/images/classroom.jpeg)',
-                }}
-              >
-                <span className="modal-banner-tag">中五班 · 整体感谢</span>
-              </div>
-              <h2>🌻 {closingText.title} 🌻</h2>
-              {closingText.paragraphs.map((p, i) => (
-                <p key={i}>{p}</p>
-              ))}
-              <div className="signature">—— {closingText.signature}</div>
-              <button
-                className="back-btn"
-                onClick={() => setShowClosing(false)}
-              >
-                ← 关闭
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </Layout>
   )
 }
