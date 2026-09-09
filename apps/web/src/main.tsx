@@ -1,10 +1,28 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter, Routes, Route, useParams, Navigate } from 'react-router-dom'
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useParams,
+  Navigate,
+  useLocation,
+} from 'react-router-dom'
 import Home from './pages/Home'
 import TeacherPage from './pages/TeacherPage'
 import FamilyThanks from './pages/FamilyThanks'
 import './styles/global.css'
+
+/** 路由切换时把滚动条重置到顶部(布局提交前执行,避免闪烁) */
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  React.useLayoutEffect(() => {
+    window.scrollTo(0, 0)
+    // 兜底:入场动画帧后再钉一次,防止异步渲染期间位置漂移
+    requestAnimationFrame(() => window.scrollTo(0, 0))
+  }, [pathname])
+  return null
+}
 
 /** 路由包装:从 URL :teacherId 拿到当前老师 id,传给 Home */
 function HomeRoute() {
@@ -16,6 +34,7 @@ function HomeRoute() {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {/* 入口默认重定向到墨墨老师 — 实际部署时每个老师拿到不同链接 */}
         <Route path="/" element={<Navigate to="/teacher/momo" replace />} />

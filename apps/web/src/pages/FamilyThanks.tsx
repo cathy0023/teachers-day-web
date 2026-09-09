@@ -24,16 +24,6 @@ export default function FamilyThanks() {
           {closingText.paragraphs.map((p, i) => (
             <p key={i}>{p}</p>
           ))}
-          <p>
-            这一年里,图图回家总会念叨学校的点点滴滴 —— 新学会的儿歌、
-            和小伙伴的小矛盾、还有被你们抱起来安慰的那个下午。
-            这些瞬间我们做家长的都记在心里。
-          </p>
-          <p>
-            教育是一场温柔的接力,你们接住了孩子们最柔软的开始,
-            也把信任交到了我们手上。愿你们在往后的日子里,
-            被同样温柔地对待,被孩子们记得,被这个世界善待。
-          </p>
         </div>
 
         <div className="letter-sign">

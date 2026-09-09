@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import Layout from '../components/Layout'
 import Confetti from '../components/Confetti'
 import {
@@ -11,24 +11,21 @@ import {
 } from '../data/teachers'
 
 /**
- * 单个盒子 — 翻面动画
- * 关键改动:不再用 CSS 3D 翻转,改用条件渲染 —
- *   flipped=false → 显示关闭的盒子
- *   flipped=true  → 显示翻开后的内容(可正常点击)
- * 这样 .open-btn 始终在文档流顶层,不会被 3D 反向或 backface 遮挡。
+ * 单个盒子 — 三种形态:
+ *   closed  → 关闭态(可点击)
+ *   fake    → 空盒:原位翻面显示调侃文案,不弹层
+ *   lifted  → 中奖盒被弹出居中展示时,原格留暗色轮廓
  */
 function GiftBox({
-  box,
   index,
-  flipped,
+  mode,
+  hint,
   onFlip,
-  onRealOpen,
 }: {
-  box: BoxT
   index: number
-  flipped: boolean
+  mode: 'closed' | 'fake' | 'lifted'
+  hint?: string
   onFlip: () => void
-  onRealOpen: (teacherId: string) => void
 }) {
   return (
     <motion.div
@@ -37,11 +34,25 @@ function GiftBox({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.4 }}
     >
-      {!flipped ? (
-        // 关闭的盒子 — 整体可点击翻面
+      {mode === 'fake' ? (
+        // 空盒 — 原位翻面,灰色调 + 文案,不可再点
+        <motion.div
+          className="box box-opened box-fake"
+          role="region"
+          aria-label="已翻开的礼物盒"
+          initial={{ rotateY: 90, opacity: 0 }}
+          animate={{ rotateY: 0, opacity: 1 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+        >
+          <div className="fake-content">
+            <div className="fake-icon">📦</div>
+            <div className="fake-hint">{hint}</div>
+          </div>
+        </motion.div>
+      ) : (
         <button
           type="button"
-          className="box box-closed"
+          className={`box box-closed${mode === 'lifted' ? ' is-lifted' : ''}`}
           onClick={onFlip}
           aria-label={`第 ${index + 1} 号礼物盒,点击翻面`}
         >
@@ -50,45 +61,6 @@ function GiftBox({
           <span className="box-knot">🎁</span>
           <span className="box-number">No. {index + 1}</span>
         </button>
-      ) : (
-        // 翻开后的内容 — 不再被 3D 翻转,按钮正常可点
-        <motion.div
-          className={`box box-opened box-${box.kind}`}
-          role="region"
-          aria-label="已翻开的礼物盒"
-          initial={{ rotateY: 90, opacity: 0 }}
-          animate={{ rotateY: 0, opacity: 1 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-        >
-          {box.kind === 'real' ? (
-            <div className="real-content">
-              <div className="real-avatar">
-                <img
-                  src={box.teacher.avatar}
-                  alt="礼物头像"
-                  onError={(e) => {
-                    ;(e.currentTarget as HTMLImageElement).style.display = 'none'
-                  }}
-                />
-              </div>
-              <button
-                type="button"
-                className="open-btn"
-                onClick={() => onRealOpen(box.teacher.id)}
-              >
-                <span className="open-btn-spark" aria-hidden>✨</span>
-                <span className="open-btn-text">进入感谢页</span>
-                <span className="open-btn-arrow" aria-hidden>→</span>
-              </button>
-              <div className="open-hint" aria-hidden>👆 这是为您准备的专属礼物</div>
-            </div>
-          ) : (
-            <div className="fake-content">
-              <div className="fake-icon">📦</div>
-              <div className="fake-hint">{box.hint}</div>
-            </div>
-          )}
-        </motion.div>
       )}
     </motion.div>
   )
@@ -105,10 +77,14 @@ export default function Home({
   const navigate = useNavigate()
   // 盒阵只在进入时生成一次(不再提供重新打乱)
   const [boxes] = useState<BoxT[]>(() => generateBoxes(currentTeacherId))
-  const [flippedSet, setFlippedSet] = useState<Set<number>>(new Set())
+  // 翻过的盒子集合(pill 计数 + fake 盒原位翻面)
+  const [openedSet, setOpenedSet] = useState<Set<number>>(new Set())
+  // 弹层展示的中奖盒下标;null = 关闭弹层
+  const [activeIdx, setActiveIdx] = useState<number | null>(null)
   // 每次翻中"自己"盒子,key++ 触发一次撒心
   const [confettiKey, setConfettiKey] = useState(-1)
-  const flippedCount = flippedSet.size
+  const active = activeIdx !== null ? boxes[activeIdx] : null
+  const flippedCount = openedSet.size
 
   return (
     <Layout>
@@ -128,7 +104,7 @@ export default function Home({
       {/* 首页 hero — 拍立得照片 + 模切贴纸标题,不再有绿色班级标签 */}
       <section className="home-hero">
         <div className="hero-photo">
-          <img src="/images/kindergarten.jpg" alt={`${school.kindergarten} ${school.className}`} />
+          <img src="/images/kindergarten.webp" alt={`${school.kindergarten} ${school.className}`} />
         </div>
         <h1 className="hero-title">
           <span className="hero-sun hero-sun-left" aria-hidden>🌻</span>
@@ -145,23 +121,90 @@ export default function Home({
           {boxes.map((b, i) => (
             <GiftBox
               key={`${currentTeacherId}-${i}`}
-              box={b}
               index={i}
-              flipped={flippedSet.has(i)}
+              mode={
+                activeIdx === i
+                  ? 'lifted'
+                  : openedSet.has(i) && b.kind === 'fake'
+                    ? 'fake'
+                    : 'closed'
+              }
+              hint={b.kind === 'fake' ? b.hint : undefined}
               onFlip={() => {
-                const next = new Set(flippedSet)
+                if (openedSet.has(i)) return
+                const next = new Set(openedSet)
                 next.add(i)
-                setFlippedSet(next)
-                // 翻中"自己"盒子 → 撒心
-                if (b.kind === 'real') setConfettiKey((k) => k + 1)
-              }}
-              onRealOpen={(teacherId) => {
-                // 命中"自己"盒子 → 跳个人感谢页
-                navigate(`/teacher/${teacherId}/thanks`)
+                setOpenedSet(next)
+                // 空盒 → 原位翻面即可;中奖盒 → 弹出居中大卡片
+                if (b.kind === 'real') {
+                  setConfettiKey((k) => k + 1)
+                  setActiveIdx(i)
+                }
               }}
             />
           ))}
         </section>
+
+        {/* 中奖弹层 — 背景为不透明页面底色,无"礼盒复制"感 */}
+        <AnimatePresence>
+          {active && (
+            <motion.div
+              className="box-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setActiveIdx(null)}
+              role="dialog"
+              aria-modal
+              aria-label="礼物盒打开结果"
+            >
+              <motion.div
+                className={`box-pop box-${active.kind}`}
+                initial={{ scale: 0.5, opacity: 0, y: 30 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.6, opacity: 0, y: 20 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  type="button"
+                  className="box-pop-close"
+                  onClick={() => setActiveIdx(null)}
+                  aria-label="关闭"
+                >
+                  ✕
+                </button>
+                {active.kind === 'real' ? (
+                  <div className="real-content">
+                    <div className="real-avatar">
+                      <img
+                        src={active.teacher.avatar}
+                        alt="礼物插画"
+                        onError={(e) => {
+                          ;(e.currentTarget as HTMLImageElement).style.display = 'none'
+                        }}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      className="open-btn"
+                      onClick={() => {
+                        navigate(`/teacher/${active.teacher.id}/thanks`)
+                      }}
+                    >
+                      进入感谢页 →
+                    </button>
+                  </div>
+                ) : (
+                  <div className="fake-content">
+                    <div className="fake-icon">📦</div>
+                    <div className="fake-hint">{active.hint}</div>
+                  </div>
+                )}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="box-progress">
           <span>
